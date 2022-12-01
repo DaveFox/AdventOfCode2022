@@ -1,1 +1,28 @@
-//wip
+const fs = require('fs');
+
+function main() {
+  const fileInput = fs.readFileSync('./Day1Input.txt', {encoding: 'utf8'});
+  let fileInputArray = fileInput.split('\n');
+  // console.log(fileInputArray);
+  let currTotal = 0;
+  let highest = 0;
+  let elfNum = 0;
+  let highestElf = 0;
+
+  for(let cal of fileInputArray) {
+    if(cal.length === 1) {
+      elfNum++;
+      if(currTotal > highest) {
+        highest = currTotal;
+        highestElf = elfNum;
+      }
+      currTotal = 0;
+    } else {
+      currTotal += Number(cal);
+    }
+  }
+
+  console.log(highest, highestElf);
+}
+
+main();

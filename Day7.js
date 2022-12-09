@@ -1,3 +1,4 @@
+const { dir } = require('console');
 const fs = require('fs');
 
 function main() {
@@ -7,19 +8,21 @@ function main() {
    '$ cd e', '$ ls', '584 i', '$ cd ..', '$ cd ..', '$ cd d', '$ ls', '4060174 j', '8033020 d.log', '5626152 d.ext', '7214296 k'];
 
    const dirMap = new Map();
-   let currentLevel = [];
+    // Note: can't use '/' as top level dir due to Map.get('/') not being allowed - so will use '#' insteaed 
+   let currentLevel = ['#'];
 
   for (const cmdLine of fileInputString) {
 
     if(cmdLine.split(' ')[0] === '$') {
       // command
       if (cmdLine.split(' ')[1] === 'cd') {
-        if (cmdLine.split(' ')[2].trim() === '..') {
+        const dirName = cmdLine.split(' ')[2];
+        if (dirName.trim() === '..') {
           // go up a level
           currentLevel.pop();
         } else {
           // go to new dir
-          currentLevel.push(cmdLine.split(' ')[2])
+          if(dirName.trim() !== '/') currentLevel.push(dirName)
         }
       }
     } else if (cmdLine.split(' ')[0] === 'dir') {
@@ -48,6 +51,17 @@ function main() {
     }
   }
   console.log('Total size under 100000:', totalSize);
+
+  const totalSpace = 70000000;
+  const usedSpace = dirMap.get('#');
+  const wantedUnusedSpace = 30000000;
+  const toRemove = wantedUnusedSpace - (totalSpace - usedSpace);
+
+  let smallest = wantedUnusedSpace + 1; // inital largest number
+  for(const size of dirMap.values()) {
+    smallest = (size >= toRemove && size < smallest) ? size : smallest;
+  }
+  console.log('Smallest Dir to delete:', smallest);
 }
 
 function dirSize() { };
